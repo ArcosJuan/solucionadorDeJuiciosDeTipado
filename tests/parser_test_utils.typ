@@ -1,10 +1,10 @@
-#import "parser_utils.typ": *
+#import "../parser/parser_utils.typ": *
 
 // Devuelve si una afirmación tipa con un tipo dado.
 // -> bool
 #let afirmacion-tipa-con(tree, tipo) = {
   return afirmacion(tree).head == "tipa" and repr(tipo-afirmacion(tree)) ==  repr(tipo)
-} 
+}
 
 
 // Devuelve si una variable tipa con un tipo dado.
@@ -23,7 +23,5 @@
   } else {
     return repr(tipado-encontrado.at(1)) == repr(tipo)
   }
-  
-} 
 
-
+}

@@ -1,4 +1,4 @@
-#import "parser_tipabilidad.typ": *
+#import "../parser/parser_tipabilidad.typ": *
 #import "parser_test_utils.typ": *
 
 
@@ -14,10 +14,11 @@
 #let (tree, rest) = parsely.parse(eq, grammar)
 #assert(afirmacion-tipa-con(tree, [a]))
 
-// var con variable x tiene variable x
-#let eq = $tack x : a$
+// var x tiene variable x
+#let eq = $tack var x : a$
 #let (tree, rest) = parsely.parse(eq, grammar)
-#assert.eq(termino(tree).variable)
+#assert.eq(repr(termino(tree).variable), repr([x]))
+
 
 // --- T-TRUE
 // Parser separa contexto individual de true: bool
@@ -50,12 +51,4 @@
 #assert.eq(repr(termino(tree).if-true), repr([N]))
 #assert.eq(repr(termino(tree).if-false), repr([P]))
 
-
-
-
-
-
-
-
-
-
+// --- T-IF

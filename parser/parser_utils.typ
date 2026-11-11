@@ -2,10 +2,12 @@
 #let afirmacion(tree) = {
   if tree.head == "prueba" {
     return tree.args.at(1)
+
   } else if tree.head == "axioma" {
     return tree.args.at(0)
+
   }
-} 
+}
 
 // Getter
 #let tipo-afirmacion(tree) = afirmacion(tree).args.at(1)
@@ -28,7 +30,7 @@
 }
 
 // Getter
-// Devuelve el termino de un juicio
+// Devuelve el termino de un juicio de tipado
 #let termino(tree) = {
   let termino = afirmacion(tree).args.at(0)
 
@@ -39,13 +41,11 @@
       if-true: termino.slots.if-true,
       if-false: termino.slots.if-false
     )
+  } else if termino.head == "var" {
+    return (
+      nombre: "var",
+      variable: termino.args.at(0),
+    )
   }
-  
+
 }
-
-
-
-
-
-
-
