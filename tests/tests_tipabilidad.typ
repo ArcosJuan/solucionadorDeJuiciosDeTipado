@@ -51,4 +51,22 @@
 #assert.eq(repr(termino(tree).if-true), repr([N]))
 #assert.eq(repr(termino(tree).if-false), repr([P]))
 
-// --- T-IF
+// --- T-APP
+// app tipa correctamente
+#let eq = $tack M app N :tau$
+#let (tree, rest) = parsely.parse(eq, grammar)
+#afirmacion-tipa-con(tree, $tau$)
+
+// app devuelve dos partes de la aplicacion
+#let eq = $tack M app N :tau$
+#let (tree, rest) = parsely.parse(eq, grammar)
+#assert.eq(repr(termino(tree).abs), repr([M]))
+#assert.eq(repr(termino(tree).arg), repr([N]))
+
+
+// --- T-ABS
+// abs tiene tipo t-abs
+#let eq = $tack M app N :tau$
+#let (tree, rest) = parsely.parse(eq, grammar)
+#assert.eq(repr(termino(tree).abs), repr([M]))
+#assert.eq(repr(termino(tree).arg), repr([N]))

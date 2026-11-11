@@ -10,7 +10,21 @@
 }
 
 // Getter
-#let tipo-afirmacion(tree) = afirmacion(tree).args.at(1)
+#let tipo-afirmacion(tree) = {
+  let t-afirmacion = afirmacion(tree).args.at(1)
+  
+  if type(t-afirmacion) == content {
+    return afirmacion(tree).args.at(1)
+
+  } else if type(t-afirmacion) == dictionary {
+    assert.eq(t-afirmacion.head,t-abs)
+    return (
+      nombre: "t-abs",
+      t-arg: t-afirmacion.args.at(0),
+      t-ret: t-afirmacion.args.at(1),
+    )
+  }
+}
 
 
 // Getter
@@ -41,11 +55,18 @@
       if-true: termino.slots.if-true,
       if-false: termino.slots.if-false
     )
+
   } else if termino.head == "var" {
     return (
       nombre: "var",
       variable: termino.args.at(0),
     )
-  }
 
+  } else if termino.head == "app" {
+    return (
+      nombre: "app",
+      abs: termino.args.at(0),
+      arg: termino.args.at(1),
+    )
+  }
 }

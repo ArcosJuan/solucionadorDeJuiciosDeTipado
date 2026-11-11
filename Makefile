@@ -13,6 +13,7 @@ test:
 
 parser:
 	$(TYPST) watch $(PARSER_FILE) parser.pdf --root=$(ROOT)
+	open parser.pdf
 
 clean:
 	rm -f */*.pdf
