@@ -1,9 +1,24 @@
 #import "../parser/parser_utils.typ": *
+#import "../parser/parser_tipabilidad.typ": *
 
 // Devuelve si una afirmación tipa con un tipo dado.
 // -> bool
 #let afirmacion-tipa-con(tree, tipo) = {
-  return afirmacion(tree).head == "tipa" and repr(tipo-afirmacion(tree)) ==  repr(tipo)
+  if tipo.func() == math.equation { tipo = tipo.body }
+
+  let tipos-coinciden = false
+  let t-afirmacion = tipo-afirmacion(tree)
+
+  if t-afirmacion.nombre == "t-simple" {
+    tipos-coinciden = repr(t-afirmacion.tipo) ==  repr(tipo)
+
+  } else if tipo-afirmacion(tree).nombre == "t-abs" {
+    let (tree, rest) = parsely.parse(tipo, grammar)
+    tipos-coinciden = repr(tree.args.at(0)) == repr(t-afirmacion.t-arg)
+    tipos-coinciden = tipos-coinciden and repr(tree.args.at(1)) ==  repr(t-afirmacion.t-ret)
+  }
+
+  return tipos-coinciden
 }
 
 

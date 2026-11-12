@@ -2,33 +2,40 @@
 #import parsely: slot
 
 #let app = $med$
-#let var = $thin$
 #let iff = "if"
 #let then = "then"
 #let elsee = "else"
 
 
 #let grammar = (
-  group: (match: $(slot("body*"))$),
+  prueba: (infix: $tack$, prec: 0),
+  axioma: (prefix: $tack$, prec: 1),
+
   tipa: (infix: $:$, prec: 1),
-  t-abs: (infix: $->$, prec: 4),
-  abs: (match: $lambda slot("ligada"): slot("t-ligada*?"). slot("t-cuerpo*"):$),
-  con: (infix: $,$, prec: 1, assoc: true),
+  abs: (match: $(lambda slot("ligada*"). slot("t-cuerpo*"))$),
+
+  con: (infix: $,$, prec: 0, assoc: true),
+  t-abs: (infix: $->$, prec: 4, assoc: true),
+
   iff: (match: $iff slot("condicion") then slot("if-true") elsee slot("if-false")$, prec: 3),
   app: (infix: $app$, prec: 4),
-  var: (prefix: $var$, prec: 4),
-  prueba: (infix: $tack$, prec: 0),
-  axioma: (prefix: $tack$, prec: 0),
+
+  group: (match: $(slot("body*"))$),
 )
 
 
-#let eq = $tack lambda x:tau->theta. lambda y: tau. x y : tau->theta$
+#let eq = $tau->pi->theta$
 #let (tree, rest) = parsely.parse(eq, grammar)
 
 
 
 #tree
 
+
 #eq
+
+
+#repr($tau$)
+
 
 #parsely.render.waterfall(tree)

@@ -12,12 +12,15 @@
 // Getter
 #let tipo-afirmacion(tree) = {
   let t-afirmacion = afirmacion(tree).args.at(1)
-  
+
   if type(t-afirmacion) == content {
-    return afirmacion(tree).args.at(1)
+    return (
+      nombre: "t-simple",
+      tipo: t-afirmacion
+    )
 
   } else if type(t-afirmacion) == dictionary {
-    assert.eq(t-afirmacion.head,t-abs)
+    assert.eq(t-afirmacion.head,"t-abs")
     return (
       nombre: "t-abs",
       t-arg: t-afirmacion.args.at(0),
@@ -48,25 +51,27 @@
 #let termino(tree) = {
   let termino = afirmacion(tree).args.at(0)
 
-  if termino.head == "iff" {
-    return (
-      nombre: "if",
-      condicion: termino.slots.condicion,
-      if-true: termino.slots.if-true,
-      if-false: termino.slots.if-false
-    )
-
-  } else if termino.head == "var" {
+  if type(termino) == content {
     return (
       nombre: "var",
-      variable: termino.args.at(0),
+      variable: termino,
     )
+  } else if type(termino) == dictionary {
+    if termino.head == "iff" {
+      return (
+        nombre: "if",
+        condicion: termino.slots.condicion,
+        if-true: termino.slots.if-true,
+        if-false: termino.slots.if-false
+      )
 
-  } else if termino.head == "app" {
-    return (
-      nombre: "app",
-      abs: termino.args.at(0),
-      arg: termino.args.at(1),
-    )
+    } else if termino.head == "app" {
+      return (
+        nombre: "app",
+        abs: termino.args.at(0),
+        arg: termino.args.at(1),
+      )
+    }
+
   }
 }

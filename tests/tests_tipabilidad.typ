@@ -15,7 +15,7 @@
 #assert(afirmacion-tipa-con(tree, [a]))
 
 // var x tiene variable x
-#let eq = $tack var x : a$
+#let eq = $tack x : a$
 #let (tree, rest) = parsely.parse(eq, grammar)
 #assert.eq(repr(termino(tree).variable), repr([x]))
 
@@ -41,7 +41,7 @@
 // if tipa correctamente
 #let eq = $tack iff M then N elsee P :"bool"$
 #let (tree, rest) = parsely.parse(eq, grammar)
-#afirmacion-tipa-con(tree, [bool])
+#assert(afirmacion-tipa-con(tree, [bool]))
 
 
 // tipado de if devuelve 3 partes de if
@@ -55,7 +55,7 @@
 // app tipa correctamente
 #let eq = $tack M app N :tau$
 #let (tree, rest) = parsely.parse(eq, grammar)
-#afirmacion-tipa-con(tree, $tau$)
+#assert(afirmacion-tipa-con(tree, $tau$))
 
 // app devuelve dos partes de la aplicacion
 #let eq = $tack M app N :tau$
@@ -65,8 +65,7 @@
 
 
 // --- T-ABS
-// abs tiene tipo t-abs
-#let eq = $tack M app N :tau$
+// abs tipa correctamente
+#let eq = $tack (lambda x:tau. x) : tau->pi$
 #let (tree, rest) = parsely.parse(eq, grammar)
-#assert.eq(repr(termino(tree).abs), repr([M]))
-#assert.eq(repr(termino(tree).arg), repr([N]))
+#assert(afirmacion-tipa-con(tree, $tau->pi$))
