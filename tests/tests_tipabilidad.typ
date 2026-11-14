@@ -12,7 +12,7 @@
 // var tipa correctamente
 #let eq = $tack x : a$
 #let (tree, rest) = parsely.parse(eq, grammar)
-#assert(afirmacion-tipa-con(tree, [a]))
+#assert(afirmacion-tipa-con(tree, $a$))
 
 // var x tiene variable x
 #let eq = $tack x : a$
@@ -25,7 +25,7 @@
 #let eq = $x:"bool" tack "true" :"bool"$
 #let (tree, rest) = parsely.parse(eq, grammar)
 #assert(variable-tipa-con(tree, [x], [bool]))
-#assert(afirmacion-tipa-con(tree, [bool]))
+#assert(afirmacion-tipa-con(tree, $"bool"$))
 
 // Parser separa contexto largo de true: bool
 #let eq = $x:"bool", y:"bool", z:"bool" tack "true" :"bool"$
@@ -33,7 +33,7 @@
 #assert(variable-tipa-con(tree, [x], [bool]))
 #assert(variable-tipa-con(tree, [y], [bool]))
 #assert(variable-tipa-con(tree, [z], [bool]))
-#assert(afirmacion-tipa-con(tree, [bool]))
+#assert(afirmacion-tipa-con(tree, $"bool"$))
 
 
 
@@ -41,7 +41,7 @@
 // if tipa correctamente
 #let eq = $tack iff M then N elsee P :"bool"$
 #let (tree, rest) = parsely.parse(eq, grammar)
-#assert(afirmacion-tipa-con(tree, [bool]))
+#assert(afirmacion-tipa-con(tree,$"bool"$))
 
 
 // tipado de if devuelve 3 partes de if
@@ -64,8 +64,25 @@
 #assert.eq(repr(termino(tree).arg), repr([N]))
 
 
-// --- T-ABS
-// abs tipa correctamente
+// --- Tipos
+// tipo simple tau en axioma tipa correctamente
+#let eq = $tack (lambda x:tau. x) : tau$
+#let (tree, rest) = parsely.parse(eq, grammar)
+#assert(afirmacion-tipa-con(tree, $tau$))
+
+// tipo simple tau en prueba tipa correctamente
+#let eq = $a: "bool" tack (lambda x:tau. x) : tau$
+#let (tree, rest) = parsely.parse(eq, grammar)
+#assert(afirmacion-tipa-con(tree, $tau$))
+
+// tipo abs tau->pi en axioma tipa correctamente
 #let eq = $tack (lambda x:tau. x) : tau->pi$
 #let (tree, rest) = parsely.parse(eq, grammar)
 #assert(afirmacion-tipa-con(tree, $tau->pi$))
+
+
+// --- T-ABS
+// abs tipa correctamente
+#let eq = $tack (lambda x:tau. x) : tau->pi->theta$
+#let (tree, rest) = parsely.parse(eq, grammar)
+#assert(afirmacion-tipa-con(tree, $tau->pi->theta$))

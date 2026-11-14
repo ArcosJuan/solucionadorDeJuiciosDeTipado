@@ -22,20 +22,3 @@
 
   group: (match: $(slot("body*"))$),
 )
-
-
-#let eq = $tau->pi->theta$
-#let (tree, rest) = parsely.parse(eq, grammar)
-
-
-
-#tree
-
-
-#eq
-
-
-#repr($tau$)
-
-
-#parsely.render.waterfall(tree)

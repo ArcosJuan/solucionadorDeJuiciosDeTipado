@@ -16,19 +16,82 @@
   if type(t-afirmacion) == content {
     return (
       nombre: "t-simple",
-      tipo: t-afirmacion
+      args: (t-afirmacion,)
     )
 
   } else if type(t-afirmacion) == dictionary {
     assert.eq(t-afirmacion.head,"t-abs")
+
+    let limpiar-tipo(t) = {
+      if type(t) == content {
+        return t;
+      } else if type(t) == dictionary {
+        if t.head == "t-abs" {
+          return t.args.map(limpiar-tipo)
+        } else if t.head == "group" {
+          if t.args.len() == 1 {return t.args.at(0)}
+          else {
+            return (
+              nombre: "group",
+              args: t.slots.body.args.map(limpiar-tipo),
+            )
+          }
+        }
+
+      }
+    }
+
     return (
       nombre: "t-abs",
-      t-arg: t-afirmacion.args.at(0),
-      t-ret: t-afirmacion.args.at(1),
+      args: limpiar-tipo(t-afirmacion),
     )
   }
 }
 
+#let simplificar-tipo(tipo) = {
+  if type(tipo) == content {return tipo}
+
+  if tipo.args.len() == 1 {
+    let elem = tipo.args.at(0);
+    if type(elem) == content {return tipo}
+    if type(elem) == dictionary and elem.nombre == "group" {
+      return simplificar-tipo(
+        (nombre: tipo.nombre, args: elem.args)
+      )
+    }
+  } else {
+    let lts-elem = tipo.args.last();
+    if type(lts-elem) == content {
+      return (
+        nombre: tipo.nombre,
+        args: tipo.args.slice(0, tipo.args.len()-1).map(simplificar-tipo) + (lts-elem,)
+      )
+    }
+    if type(lts-elem) == dictionary and lts-elem.nombre == "group" {
+      return (
+        nombre: tipo.nombre,
+        args: tipo.args.slice(0, tipo.args.len()-1).map(simplificar-tipo) + simplificar-tipo(lts-elem).args
+      )
+    }
+  }
+}
+
+#let tipo2equation(tipo) = {
+  if type(tipo) == content {return $tipo$}
+  if tipo.nombre == "t-simple" {
+    return tipo2equation(tipo.args.at(0))
+  } else if tipo.nombre == "t-abs" {
+    return $#tipo.args.map(eq => tipo2equation(eq).body).join(sym.arrow.r)$
+  }
+  if tipo.nombre == "group" {
+    return $(#tipo.args.map(eq => tipo2equation(eq).body).join((sym.arrow.r)))$
+  }
+}
+
+
+#let tipo-es-lo-mas-simple(tipo) = {
+  return tipo == simplificar-tipo(tipo);
+}
 
 // Getter
 // Devuelve una lista de tuplas (x, t) tal que x es una variable y t un tipo.
