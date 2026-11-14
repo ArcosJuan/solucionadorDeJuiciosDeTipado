@@ -1,6 +1,8 @@
 #import "../parser/parser_tipabilidad.typ": *
 #import "parser_test_utils.typ": *
 
+#import "tests_tipos.typ"
+
 
 // tipado de axioma devuelve axioma y tipa dentro
 #let eq = $tack "true" :"bool"$
@@ -63,22 +65,6 @@
 #assert.eq(repr(termino(tree).abs), repr([M]))
 #assert.eq(repr(termino(tree).arg), repr([N]))
 
-
-// --- Tipos
-// tipo simple tau en axioma tipa correctamente
-#let eq = $tack (lambda x:tau. x) : tau$
-#let (tree, rest) = parsely.parse(eq, grammar)
-#assert(afirmacion-tipa-con(tree, $tau$))
-
-// tipo simple tau en prueba tipa correctamente
-#let eq = $a: "bool" tack (lambda x:tau. x) : tau$
-#let (tree, rest) = parsely.parse(eq, grammar)
-#assert(afirmacion-tipa-con(tree, $tau$))
-
-// tipo abs tau->pi en axioma tipa correctamente
-#let eq = $tack (lambda x:tau. x) : tau->pi$
-#let (tree, rest) = parsely.parse(eq, grammar)
-#assert(afirmacion-tipa-con(tree, $tau->pi$))
 
 
 // --- T-ABS
