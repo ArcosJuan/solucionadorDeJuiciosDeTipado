@@ -4,26 +4,14 @@
 
 
 
-#let eq = $tack x: theta$
+#let eq = $tack (lambda x:tau, y:(pi->delta)->gamma. x): theta$
 #let (tree, rest) = parsely.parse(eq, grammar)
-
-#tree
-
-#let tipo = tipo-afirmacion(tree)
-#let tipo-simple = simplificar-tipo(tipo)
-
-#pagebreak()
-
-#tipo
-
-#repr(tipo2equation(tipo))
-
-#repr($tau->pi->theta$)
-
-#{tipo2equation(tipo) == $theta$}
-
-#tipo-simple
 
 #eq
 
-#parsely.render.waterfall(tree)
+#tree
+
+#pagebreak()
+
+#termino(tree)
+

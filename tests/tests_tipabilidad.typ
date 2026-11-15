@@ -19,7 +19,7 @@
 // var x tiene variable x
 #let eq = $tack x : a$
 #let (tree, rest) = parsely.parse(eq, grammar)
-#assert.eq(repr(termino(tree).variable), repr([x]))
+#assert.eq(repr(termino(tree)), repr([x]))
 
 
 // --- T-TRUE

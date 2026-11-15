@@ -9,44 +9,48 @@
   }
 }
 
-// Getter
-#let tipo-afirmacion(tree) = {
-  let t-afirmacion = afirmacion(tree).args.at(1)
-
-  if type(t-afirmacion) == content {
-    return (
-      nombre: "t-simple",
-      args: (t-afirmacion,)
-    )
-
-  } else if type(t-afirmacion) == dictionary {
-    assert.eq(t-afirmacion.head,"t-abs")
-
-    let limpiar-tipo(t) = {
-      if type(t) == content {
-        return t;
-      } else if type(t) == dictionary {
-        if t.head == "t-abs" {
-          return t.args.map(limpiar-tipo)
-        } else if t.head == "group" {
-          if t.args.len() == 1 {return t.args.at(0)}
-          else {
-            return (
-              nombre: "group",
-              args: t.slots.body.args.map(limpiar-tipo),
-            )
-          }
-        }
-
+// Devuelve el tipo prettier de un diccionario de tipo
+#let limpiar-tipo(t) = {
+  if type(t) == content {
+    return t;
+  } else if type(t) == dictionary {
+    if t.head == "t-abs" {
+      return t.args.map(limpiar-tipo)
+    } else if t.head == "group" {
+      if t.args.len() == 1 {return t.args.at(0)}
+      else {
+        return (
+          nombre: "group",
+          args: t.slots.body.args.map(limpiar-tipo),
+        )
       }
     }
 
+  }
+}
+
+// Devuelve el tipado prettier de un diccionario "tipa"
+#let tipado(tipa) = {
+  let raw-tipo = tipa.args.at(1)
+
+  if type(raw-tipo) == content {
+    return (
+      nombre: "t-simple",
+      args: (raw-tipo,)
+    )
+
+  } else if type(raw-tipo) == dictionary {
+    assert.eq(raw-tipo.head,"t-abs")
+
     return (
       nombre: "t-abs",
-      args: limpiar-tipo(t-afirmacion),
+      args: limpiar-tipo(raw-tipo),
     )
   }
 }
+
+// Getter
+#let tipo-afirmacion(tree) = { return tipado(afirmacion(tree)) }
 
 #let simplificar-tipo(tipo) = {
   if type(tipo) == content {return tipo}
@@ -89,6 +93,7 @@
 }
 
 
+// Devuelve si el tipo pasado por parametro no puede ser simplificado.
 #let tipo-es-lo-mas-simple(tipo) = {
   return tipo == simplificar-tipo(tipo);
 }
@@ -113,28 +118,49 @@
 // Devuelve el termino de un juicio de tipado
 #let termino(tree) = {
   let termino = afirmacion(tree).args.at(0)
-
-  if type(termino) == content {
-    return (
-      nombre: "var",
-      variable: termino,
-    )
-  } else if type(termino) == dictionary {
-    if termino.head == "iff" {
-      return (
-        nombre: "if",
-        condicion: termino.slots.condicion,
-        if-true: termino.slots.if-true,
-        if-false: termino.slots.if-false
-      )
-
-    } else if termino.head == "app" {
-      return (
-        nombre: "app",
-        abs: termino.args.at(0),
-        arg: termino.args.at(1),
-      )
+  
+  let sub-termino(raw-term) = {
+    if type(raw-term) == content {
+      return raw-term
+    } else if type(raw-term) == dictionary {
+      if raw-term.head == "group" {
+        return sub-termino(raw-term.slots.body)
+      } else if raw-term.head == "iff" {
+        return (
+          nombre: "if",
+          condicion: sub-termino(raw-term.slots.condicion),
+          if-true: sub-termino(raw-term.slots.if-true),
+          if-false: sub-termino(raw-term.slots.if-false)
+        )
+      } else if raw-term.head == "app" {
+        return (
+          nombre: "app",
+          abs: sub-termino(raw-term.args.at(0)),
+          arg: sub-termino(raw-term.args.at(1)),
+        )
+      } else if raw-term.head == "abs" {
+        return (
+          nombre: "abs",
+          ligada: {
+            if raw-term.slots.ligada.head == "tipa" {
+              (
+                var: raw-term.slots.ligada.args.at(0),
+                tipo: limpiar-tipo(raw-term.slots.ligada.args.at(1))
+              )
+            } else if raw-term.slots.ligada.head == "con" {
+              raw-term.slots.ligada.args.map(
+                tipa => (
+                  var: tipa.args.at(0),
+                  tipo: tipado(tipa),
+                ) 
+              )
+            }
+          },
+          t-cuerpo: sub-termino(raw-term.slots.t-cuerpo)
+        )
+      }
     }
-
   }
+
+  return sub-termino(termino)
 }
